@@ -145,15 +145,8 @@
                         <!-- Quick Color Swatch Options -->
                         <div class="flex items-center gap-1.5 pl-1 sm:border-l border-slate-800 shrink-0">
                             <span class="text-xs text-slate-500 hidden xl:inline mr-1">快捷試色：</span>
-                            <div class="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-[200px] sm:max-w-none">
-                                <button onclick="setPickerColor('#64748B')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #64748B;" title="#64748B"></button>
-                                <button onclick="setPickerColor('#78716C')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #78716C;" title="#78716C"></button>
-                                <button onclick="setPickerColor('#52525B')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #52525B;" title="#52525B"></button>
-                                <button onclick="setPickerColor('#84A98C')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #84A98C;" title="#84A98C"></button>
-                                <button onclick="setPickerColor('#6B8E23')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #6B8E23;" title="#6B8E23"></button>
-                                <button onclick="setPickerColor('#708090')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #708090;" title="#708090"></button>
-                                <button onclick="setPickerColor('#A3B18A')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #A3B18A;" title="#A3B18A"></button>
-                                <button onclick="setPickerColor('#B5838D')" class="w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0" style="background-color: #B5838D;" title="#B5838D"></button>
+                            <div id="quickSwatchesContainer" class="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-[200px] sm:max-w-none">
+                                <!-- Dynamic swatches generated on load -->
                             </div>
                         </div>
                     </div>
@@ -315,7 +308,7 @@
 
     <script>
         // State variables
-        let currentColors = ['#64748B', '#78716C', '#52525B', '#84A98C'];
+        let currentColors = [];
         let savedPalettes = [];
         let savedViewMode = 'detailed'; // 'detailed' | 'compact'
 
@@ -336,10 +329,41 @@
                 console.error("Could not load saved palettes", e);
             }
 
+            // 每次載入時隨機產生工作區預設色票 (4 個顏色)
+            currentColors = Array.from({ length: 4 }, () => getRandomHexColor());
+
+            // 每次載入時隨機產生快捷試色塊
+            renderRandomQuickSwatches();
+
+            // 同步選擇器為第一個隨機色
+            if (currentColors.length > 0) {
+                syncColorFromPicker(currentColors[0]);
+            }
+
             renderPalette();
             renderSavedDrawer();
             updateUIPreviews();
         };
+
+        function getRandomHexColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase();
+        }
+
+        function renderRandomQuickSwatches() {
+            const container = document.getElementById('quickSwatchesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 8; i++) {
+                const hex = getRandomHexColor();
+                const btn = document.createElement('button');
+                btn.className = "w-5 h-5 rounded transition hover:scale-110 shadow-sm shrink-0";
+                btn.style.backgroundColor = hex;
+                btn.title = hex;
+                btn.onclick = () => setPickerColor(hex);
+                container.appendChild(btn);
+            }
+        }
 
         function syncColorFromPicker(color) {
             pickerInput.value = color;
