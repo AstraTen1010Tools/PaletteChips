@@ -27,6 +27,7 @@
     </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         ::-webkit-scrollbar {
             width: 7px;
@@ -56,9 +57,62 @@
             backdrop-filter: blur(8px);
             border: 1px solid #2d313c;
         }
+
+        /* SVG Color Vision Deficiency Simulation Filters */
+        .cb-redgreen { filter: url('#redgreen-filter'); }
+        .cb-protanopia { filter: url('#protanopia-filter'); }
+        .cb-protanomaly { filter: url('#protanomaly-filter'); }
+        .cb-deuteranopia { filter: url('#deuteranopia-filter'); }
+        .cb-deuteranomaly { filter: url('#deuteranomaly-filter'); }
+        .cb-tritanopia { filter: url('#tritanopia-filter'); }
+        .cb-tritanomaly { filter: url('#tritanomaly-filter'); }
+        .cb-achromatopsia { filter: url('#achromatopsia-filter'); }
+        .cb-achromatomaly { filter: url('#achromatomaly-filter'); }
     </style>
 </head>
-<body class="bg-darkBg text-slate-200 min-h-screen font-sans flex flex-col antialiased selection:bg-slate-700 selection:text-slate-100">
+<body class="bg-darkBg text-slate-200 min-h-screen font-sans flex flex-col antialiased selection:bg-slate-700 selection:text-slate-100 relative">
+
+    <!-- SVG Filters for Color Blindness & Weakness Simulation -->
+    <svg class="hidden">
+        <defs>
+            <!-- Red-Green Color Blindness (紅綠色盲) -->
+            <filter id="redgreen-filter">
+                <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.625 0.375 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Protanopia (紅色盲 - Complete Red) -->
+            <filter id="protanopia-filter">
+                <feColorMatrix type="matrix" values="0.56667 0.43333 0 0 0  0.55833 0.44167 0 0 0  0 0.24167 0.75833 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Protanomaly (紅色弱 - Partial Red) -->
+            <filter id="protanomaly-filter">
+                <feColorMatrix type="matrix" values="0.81667 0.18333 0 0 0  0.33333 0.66667 0 0 0  0 0.125 0.875 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Deuteranopia (綠色盲 - Complete Green) -->
+            <filter id="deuteranopia-filter">
+                <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Deuteranomaly (綠色弱 - Partial Green) -->
+            <filter id="deuteranomaly-filter">
+                <feColorMatrix type="matrix" values="0.8 0.2 0 0 0  0.25833 0.74167 0 0 0  0 0.14167 0.85833 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Tritanopia (藍色盲 - Complete Blue) -->
+            <filter id="tritanopia-filter">
+                <feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.43333 0.56667 0 0  0 0.475 0.525 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Tritanomaly (藍色弱 - Partial Blue) -->
+            <filter id="tritanomaly-filter">
+                <feColorMatrix type="matrix" values="0.96667 0.03333 0 0 0  0 0.73333 0.26667 0 0  0 0.18333 0.81667 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Achromatopsia (全色盲 - Monochromacy) -->
+            <filter id="achromatopsia-filter">
+                <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0"/>
+            </filter>
+            <!-- Achromatomaly (全色弱 - Partial Monochromacy) -->
+            <filter id="achromatomaly-filter">
+                <feColorMatrix type="matrix" values="0.618 0.320 0.062 0 0  0.163 0.775 0.062 0 0  0.163 0.320 0.518 0 0  0 0 0 1 0"/>
+            </filter>
+        </defs>
+    </svg>
 
     <header class="sticky top-0 z-30 bg-cardBg/95 backdrop-blur-md border-b border-cardBorder px-4 lg:px-8 py-3.5 transition-all">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
@@ -73,16 +127,20 @@
             </div>
 
             <!-- Top Actions -->
-            <div class="flex items-center space-x-2 sm:space-x-2.5">
-                <button onclick="toggleSavedDrawer()" class="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60">
-                    <i class="fa-regular fa-folder-open text-slate-400"></i>
-                    <span class="hidden sm:inline">已儲存色票</span>
-                    <span id="savedCountBadge" class="bg-slate-700 text-slate-300 text-[11px] px-2 py-0.5 rounded-full font-mono">0</span>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <button onclick="openImageExtractModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60">
+                    <i class="fa-solid fa-image text-slate-400"></i>
+                    <span class="hidden sm:inline">圖片吸色</span>
                 </button>
                 
-                <button onclick="exportJSON()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60">
+                <button onclick="openExportModal()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60">
                     <i class="fa-solid fa-file-export text-slate-400"></i>
-                    <span class="hidden sm:inline">匯出 JSON</span>
+                    <span class="hidden sm:inline">多格式匯出</span>
+                </button>
+
+                <button onclick="sharePaletteURL()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60" title="複製分享網址">
+                    <i class="fa-solid fa-share-nodes text-slate-400"></i>
+                    <span class="hidden sm:inline">分享</span>
                 </button>
 
                 <label class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-2 border border-slate-700/60 cursor-pointer">
@@ -103,7 +161,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-cardBorderSubtle">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-200 tracking-wide">色票工作區</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">自訂 1 至 8 個顏色的色彩組合</p>
+                    <p class="text-xs text-slate-400 mt-0.5">自訂 1 至 8 個顏色的色彩組合，即時測試與微調</p>
                 </div>
 
                 <div class="flex items-center gap-2 self-end sm:self-auto">
@@ -129,8 +187,8 @@
                         
                         <!-- Combined Color Swatch & Hex Field -->
                         <div class="relative flex items-center bg-cardBg border border-slate-700/80 rounded-xl px-2.5 py-1 focus-within:border-slate-500 transition-all flex-1 max-w-xs min-w-[180px]">
-                            <!-- Color Picker Swatch -->
-                            <input type="color" id="pickerInput" value="#6B7280" onchange="syncColorFromPicker(this.value)" class="w-7 h-7 rounded-lg cursor-pointer border-0 p-0 bg-transparent shrink-0">
+                            <!-- Color Picker Swatch (Native EyeDropper Included) -->
+                            <input type="color" id="pickerInput" value="#6B7280" oninput="syncColorFromPicker(this.value)" class="w-7 h-7 rounded-lg cursor-pointer border-0 p-0 bg-transparent shrink-0" title="點擊選擇色彩或使用原生吸色筆">
                             
                             <span class="text-slate-500 font-mono pl-2 select-none text-xs">#</span>
                             <input type="text" id="hexText" value="6B7280" maxlength="6" oninput="syncColorFromText(this.value)" onkeydown="if(event.key==='Enter') addColorToPalette()" class="w-full bg-transparent text-slate-200 font-mono font-medium text-sm focus:outline-none px-1 uppercase tracking-wider" placeholder="6B7280">
@@ -158,48 +216,79 @@
                     </button>
                 </div>
 
-                <!-- BOTTOM AREA: Live Color Palette Display Container -->
-                <div class="space-y-2.5 w-full">
+                <div class="space-y-2.5 w-full relative">
                     <div class="flex items-center justify-between text-xs text-slate-400 px-1">
                         <span class="font-medium text-slate-300 flex items-center gap-2">
                             <span>即時色彩組合</span>
                             <span id="paletteCountText" class="text-slate-400 font-mono text-[11px]">(0/8)</span>
                         </span>
-                        <span class="text-slate-500"><i class="fa-regular fa-lightbulb text-slate-400 mr-1"></i>點擊色塊或 Hex 碼即可複製</span>
+                        <span class="text-slate-500"><i class="fa-regular fa-lightbulb text-slate-400 mr-1"></i>點擊色條校正色彩，點擊 Hex 碼複製</span>
                     </div>
 
                     <!-- Palette Bar Block -->
-                    <div id="paletteContainer" class="w-full transition-all space-y-2">
-                        <!-- Seamless connected palette bar without #1 #2 labels generated dynamically -->
+                    <div id="paletteSimulationContainer" class="w-full transition-all">
+                        <div id="paletteContainer" class="w-full transition-all space-y-2">
+                            <!-- Seamless connected palette bar dynamically rendered -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- Palette Tools Bar -->
+                <!-- Palette Tools & Extended Harmonies Bar -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-slate-400 border-t border-cardBorderSubtle">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-slate-500">快速調色：</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-slate-500 mr-1">快速調色：</span>
                         <button onclick="generateHarmony('analogous')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">類似色</button>
                         <button onclick="generateHarmony('complementary')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">互補色</button>
+                        <button onclick="generateHarmony('split-complementary')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">分裂互補</button>
                         <button onclick="generateHarmony('triadic')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">三角色</button>
+                        <button onclick="generateHarmony('tetradic')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">矩形色</button>
                         <button onclick="generateHarmony('monochromatic')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">單色系</button>
+                        <button onclick="generateHarmony('shades')" class="px-2.5 py-1 rounded-lg bg-cardBg hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition">明暗階調</button>
                     </div>
 
-                    <button onclick="copyCSSVariables()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition flex items-center gap-1.5 font-mono text-xs">
-                        <i class="fa-regular fa-copy"></i>
-                        <span>複製 CSS 變數</span>
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <!-- Copy Hash Option Toggle -->
+                        <label class="flex items-center gap-1.5 cursor-pointer text-xs text-slate-400 hover:text-slate-200 select-none">
+                            <input type="checkbox" id="includeHashToggle" onchange="toggleIncludeHash(this.checked)" class="rounded bg-darkBg border-slate-700 text-slate-600 focus:ring-0 focus:ring-offset-0 cursor-pointer">
+                            <span>複製時包含「#」</span>
+                        </label>
+                    </div>
                 </div>
 
             </div>
         </section>
 
         <section class="space-y-3.5">
-            <h3 class="text-sm font-medium text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-slate-400"></i>
-                <span>UI 效果與對比預覽</span>
-            </h3>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h3 class="text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-slate-400"></i>
+                    <span>UI 效果與對比預覽</span>
+                </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Color Vision Deficiency Simulation Dropdown (Expanded) -->
+                <div class="flex items-center gap-2 bg-cardBg px-3 py-1.5 rounded-xl border border-cardBorder text-xs">
+                    <i class="fa-solid fa-eye text-slate-400"></i>
+                    <span class="text-slate-400">視覺模擬：</span>
+                    <select id="cbSimulationSelect" onchange="applyColorBlindnessFilter(this.value)" class="bg-cardBg text-slate-200 focus:outline-none cursor-pointer font-medium border-0 py-0.5">
+                        <option value="none">正常視覺 (Normal)</option>
+                        <optgroup label="色弱 (Anomalous Trichromacy)">
+                            <option value="protanomaly">紅色弱 (Protanomaly)</option>
+                            <option value="deuteranomaly">綠色弱 (Deuteranomaly)</option>
+                            <option value="tritanomaly">藍色弱 (Tritanomaly)</option>
+                            <option value="achromatomaly">全色弱 (Achromatomaly)</option>
+                        </optgroup>
+                        <optgroup label="色盲 (Dichromacy & Monochromacy)">
+                            <option value="redgreen">紅綠色盲 (Red-Green Blindness)</option>
+                            <option value="protanopia">紅色盲 (Protanopia)</option>
+                            <option value="deuteranopia">綠色盲 (Deuteranopia)</option>
+                            <option value="tritanopia">藍色盲 (Tritanopia)</option>
+                            <option value="achromatopsia">全色盲 (Achromatopsia)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div id="previewGridArea" class="grid grid-cols-1 md:grid-cols-3 gap-4 transition-all">
                 <!-- Mockup Card 1: Buttons & Badges -->
                 <div class="bg-cardBg rounded-xl p-4 border border-cardBorder space-y-3">
                     <h4 class="text-[11px] font-medium uppercase tracking-wider text-slate-500">按鈕樣式</h4>
@@ -231,6 +320,124 @@
         </section>
 
     </main>
+
+    <!-- Color Correction Non-Dimming Popover -->
+    <div id="colorPopover" class="hidden absolute z-40 w-64 bg-cardBg border border-slate-700 rounded-xl shadow-2xl p-3 space-y-2.5 text-xs">
+        <div class="flex items-center justify-between border-b border-cardBorderSubtle pb-1.5">
+            <span class="font-medium text-slate-200 text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders text-slate-400 text-[11px]"></i>
+                <span>色彩微調</span>
+            </span>
+            <button onclick="cancelPopoverCorrection()" class="text-slate-400 hover:text-slate-200 p-0.5 rounded-lg">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Before / After Color Comparison -->
+        <div class="space-y-1">
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+                <span>原色彩</span>
+                <span>即時預覽</span>
+            </div>
+            <div class="flex h-8 rounded-lg overflow-hidden border border-slate-700/80 shadow-inner">
+                <div id="popoverOriginalPreview" class="flex-1 h-full flex items-center justify-center font-mono text-[10px] font-medium select-none"></div>
+                <div id="popoverNewPreview" class="flex-1 h-full flex items-center justify-center font-mono text-[10px] font-medium select-none transition-colors"></div>
+            </div>
+        </div>
+
+        <!-- Compact HSL Sliders -->
+        <div class="space-y-1.5 pt-1 border-t border-cardBorderSubtle/60">
+            <!-- Hue Slider Row -->
+            <div class="flex items-center gap-2">
+                <span class="w-3 text-[10px] font-semibold text-slate-400 shrink-0">H</span>
+                <input type="range" id="popoverHueSlider" min="0" max="360" value="0" oninput="syncPopoverFromHSL()" class="flex-1 h-1 bg-slate-700 rounded appearance-none cursor-pointer accent-slate-400">
+                <span id="popoverHueVal" class="w-8 text-right font-mono text-[10px] text-slate-300 shrink-0">0°</span>
+            </div>
+
+            <!-- Saturation Slider Row -->
+            <div class="flex items-center gap-2">
+                <span class="w-3 text-[10px] font-semibold text-slate-400 shrink-0">S</span>
+                <input type="range" id="popoverSatSlider" min="0" max="100" value="0" oninput="syncPopoverFromHSL()" class="flex-1 h-1 bg-slate-700 rounded appearance-none cursor-pointer accent-slate-400">
+                <span id="popoverSatVal" class="w-8 text-right font-mono text-[10px] text-slate-300 shrink-0">0%</span>
+            </div>
+
+            <!-- Lightness Slider Row -->
+            <div class="flex items-center gap-2">
+                <span class="w-3 text-[10px] font-semibold text-slate-400 shrink-0">L</span>
+                <input type="range" id="popoverLightSlider" min="0" max="100" value="0" oninput="syncPopoverFromHSL()" class="flex-1 h-1 bg-slate-700 rounded appearance-none cursor-pointer accent-slate-400">
+                <span id="popoverLightVal" class="w-8 text-right font-mono text-[10px] text-slate-300 shrink-0">0%</span>
+            </div>
+        </div>
+
+        <!-- Integrated Color Picker & Hex Input -->
+        <div class="pt-1.5 border-t border-cardBorderSubtle/60">
+            <div class="flex items-center gap-1.5">
+                <input type="color" id="popoverColorPicker" oninput="syncPopoverFromPicker(this.value)" class="w-6 h-6 rounded-md cursor-pointer border-0 p-0 bg-transparent shrink-0" title="開啟選擇器">
+                <div class="relative flex items-center bg-darkBg border border-slate-700 rounded-lg px-2 py-1 flex-1 focus-within:border-slate-500 transition">
+                    <span class="text-slate-500 font-mono text-[11px] select-none">#</span>
+                    <input type="text" id="popoverHexInput" maxlength="6" oninput="syncPopoverFromHex(this.value)" class="w-full bg-transparent text-slate-200 font-mono font-medium text-[11px] focus:outline-none px-1 uppercase tracking-wider">
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Action Buttons -->
+        <div class="flex items-center justify-between pt-1.5 border-t border-cardBorderSubtle">
+            <button onclick="copyCurrentPopoverColor()" class="px-2 py-1 rounded-md bg-darkBg hover:bg-slate-800 text-slate-300 border border-slate-700/80 transition flex items-center gap-1 text-[10px]" title="複製目前色碼">
+                <i class="fa-regular fa-copy"></i>
+                <span>複製</span>
+            </button>
+
+            <div class="flex items-center gap-1">
+                <button onclick="cancelPopoverCorrection()" class="px-2 py-1 rounded-md text-slate-400 hover:text-slate-200 transition text-[10px]">取消</button>
+                <button onclick="applyPopoverCorrection()" class="px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium transition border border-slate-600/80 shadow-xs text-[10px]">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Color Extractor Modal -->
+    <div id="imageExtractModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 w-full max-w-xl mx-4 shadow-2xl space-y-4 max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-200">
+            <div class="flex items-center justify-between border-b border-cardBorderSubtle pb-2.5">
+                <h3 class="font-medium text-slate-200 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-image text-slate-400"></i>
+                    <span>圖片色彩吸取與分析</span>
+                </h3>
+                <button onclick="closeImageExtractModal()" class="text-slate-400 hover:text-slate-200 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 flex-1 overflow-y-auto">
+                <div class="flex items-center justify-between gap-2">
+                    <label class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 cursor-pointer flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>選擇圖片檔</span>
+                        <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                    </label>
+                    <span class="text-[11px] text-slate-500">點擊圖片可任意吸色，或自動辨識主要色彩</span>
+                </div>
+
+                <!-- Canvas Preview Area -->
+                <div id="canvasDropZone" class="relative min-h-[200px] max-h-[320px] bg-darkBg border-2 border-dashed border-slate-700/80 rounded-xl flex items-center justify-center overflow-hidden">
+                    <p id="imagePlaceholderText" class="text-xs text-slate-500">拖曳圖片至此或點擊「選擇圖片檔」</p>
+                    <canvas id="extractCanvas" class="max-w-full max-h-[300px] object-contain cursor-crosshair hidden" onclick="pickColorFromCanvas(event)"></canvas>
+                </div>
+
+                <!-- Extracted Color Palette Suggestions -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <span>辨識出之主色調：</span>
+                        <button onclick="applyExtractedPalette()" id="applyExtractedBtn" disabled class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:hover:bg-slate-700 text-slate-100 text-xs font-medium transition">
+                            帶入工作區
+                        </button>
+                    </div>
+                    <div id="extractedSwatches" class="flex h-10 rounded-xl overflow-hidden border border-slate-700/60 bg-darkBg/80 p-1 gap-1">
+                        <div class="flex-1 flex items-center justify-center text-xs text-slate-600 italic">尚無分析顏色</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Saved Palettes Drawer -->
     <div id="savedDrawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-cardBg border-l border-cardBorder shadow-2xl z-50 transform translate-x-full transition-transform duration-250 ease-in-out flex flex-col">
@@ -268,7 +475,7 @@
         </div>
     </div>
 
-    <!-- Save Palette Naming Modal -->
+    <!-- Save Palette Modal (With Overwrite Option) -->
     <div id="saveModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 w-full max-w-md mx-4 shadow-xl space-y-4 transform scale-95 transition-transform duration-200">
             <div class="flex items-center justify-between border-b border-cardBorderSubtle pb-2.5">
@@ -280,15 +487,87 @@
                     <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
+
+            <!-- Overwrite Existing Palette Selector -->
+            <div class="space-y-1.5">
+                <label class="text-xs font-medium text-slate-400">選擇儲存模式</label>
+                <select id="saveTargetSelect" onchange="handleSaveTargetChange(this.value)" class="w-full bg-darkBg border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-slate-500 font-medium cursor-pointer">
+                    <option value="NEW">+ 另存為新色票</option>
+                    <!-- Dynamically populated with existing saved palettes -->
+                </select>
+            </div>
+
             <div class="space-y-1.5">
                 <label class="text-xs font-medium text-slate-400">色票組合名稱</label>
                 <input type="text" id="paletteNameInput" placeholder="例如：極簡冷調、莫蘭迪日落..." class="w-full bg-darkBg border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-slate-500 font-medium">
             </div>
+
             <!-- Color preview strip inside modal -->
             <div id="modalColorPreview" class="flex h-6 rounded-lg overflow-hidden border border-slate-700/60"></div>
+            
             <div class="flex justify-end gap-2 pt-1">
                 <button onclick="closeSaveModal()" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:bg-slate-800/80 text-xs font-medium transition">取消</button>
-                <button onclick="confirmSavePalette()" class="px-4 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600/80 text-slate-100 text-xs font-medium transition shadow-sm">確認儲存</button>
+                <button onclick="confirmSavePalette()" id="confirmSaveBtn" class="px-4 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600/80 text-slate-100 text-xs font-medium transition shadow-sm">確認儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Palette Modal -->
+    <div id="renameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 w-full max-w-sm mx-4 shadow-xl space-y-4 transform scale-95 transition-transform duration-200">
+            <div class="flex items-center justify-between border-b border-cardBorderSubtle pb-2.5">
+                <h3 class="font-medium text-slate-200 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-pen text-slate-400"></i>
+                    <span>修改色票名稱</span>
+                </h3>
+                <button onclick="closeRenameModal()" class="text-slate-400 hover:text-slate-200 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-xs font-medium text-slate-400">新名稱</label>
+                <input type="text" id="renameInput" class="w-full bg-darkBg border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-slate-500 font-medium" onkeydown="if(event.key==='Enter') confirmRenamePalette()">
+            </div>
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeRenameModal()" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:bg-slate-800/80 text-xs font-medium transition">取消</button>
+                <button onclick="confirmRenamePalette()" class="px-4 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600/80 text-slate-100 text-xs font-medium transition shadow-sm">更新名稱</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Format Export Modal -->
+    <div id="exportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 w-full max-w-lg mx-4 shadow-2xl space-y-4 transform scale-95 transition-transform duration-200">
+            <div class="flex items-center justify-between border-b border-cardBorderSubtle pb-2.5">
+                <h3 class="font-medium text-slate-200 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-file-export text-slate-400"></i>
+                    <span>多格式色票匯出</span>
+                </h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-200 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <!-- Export Format Tabs -->
+            <div class="flex border-b border-slate-700 text-xs font-medium gap-1 sm:gap-2 overflow-x-auto">
+                <button onclick="setExportTab('tailwind')" id="tabTailwind" class="py-2 px-3 border-b-2 border-slate-300 text-slate-200 shrink-0">Tailwind Config</button>
+                <button onclick="setExportTab('cssvars')" id="tabCSSVars" class="py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-300 shrink-0">CSS 變數</button>
+                <button onclick="setExportTab('scss')" id="tabSCSS" class="py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-300 shrink-0">SCSS / SASS</button>
+                <button onclick="setExportTab('json')" id="tabJSON" class="py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-300 shrink-0">JSON</button>
+                <button onclick="setExportTab('svg')" id="tabSVG" class="py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-300 shrink-0">SVG 檔案</button>
+            </div>
+
+            <!-- Code Preview Block -->
+            <div class="relative">
+                <textarea id="exportCodeTextarea" readonly class="w-full h-48 bg-darkBg border border-slate-700/80 rounded-xl p-3 font-mono text-xs text-slate-300 focus:outline-none resize-none"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeExportModal()" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:bg-slate-800/80 text-xs font-medium transition">關閉</button>
+                <button onclick="downloadOrCopyExport()" id="exportActionBtn" class="px-4 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600/80 text-slate-100 text-xs font-medium transition shadow-sm flex items-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>複製內容</span>
+                </button>
             </div>
         </div>
     </div>
@@ -298,6 +577,12 @@
         <i class="fa-solid fa-bookmark text-xs text-slate-400"></i>
         <span class="writing-mode-vertical tracking-widest py-1 text-[11px]" style="writing-mode: vertical-rl;">已儲存色票</span>
         <span id="floatingSavedBadge" class="bg-slate-700 text-slate-200 w-4 h-4 rounded-full flex items-center justify-center font-mono text-[9px]">0</span>
+    </button>
+
+    <!-- Easter Egg Corner Button: Full UI Vision Deficiency Simulation Toggle -->
+    <button id="easterEggBtn" onclick="toggleFullUISimulation()" class="fixed bottom-3 left-3 z-30 px-2.5 py-1.5 rounded-xl bg-cardBg/90 hover:bg-cardBg border border-cardBorder text-[11px] text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5 shadow-lg backdrop-blur-xs select-none" title="點擊切換：讓色盲/色弱模擬影響全界面或僅影響色票條">
+        <i class="fa-solid fa-flask text-slate-400 text-xs"></i>
+        <span>全界面模擬: <strong id="fullUILabel" class="text-slate-400 font-normal">OFF</strong></span>
     </button>
 
     <!-- Toast Notification Overlay -->
@@ -311,6 +596,18 @@
         let currentColors = [];
         let savedPalettes = [];
         let savedViewMode = 'detailed'; // 'detailed' | 'compact'
+        let includeHash = true;
+        let isFullUISimulation = false; // Easter egg state for page-wide vision simulation
+
+        // Popover Correction State
+        let activePopoverIndex = -1;
+        let originalPopoverColor = '';
+        let currentPopoverColor = '';
+
+        // Rename & Export State
+        let activeRenameId = null;
+        let activeExportTab = 'tailwind';
+        let extractedColors = [];
 
         // DOM elements
         const pickerInput = document.getElementById('pickerInput');
@@ -318,6 +615,7 @@
         const paletteContainer = document.getElementById('paletteContainer');
         const addBtnText = document.getElementById('addBtnText');
         const paletteCountText = document.getElementById('paletteCountText');
+        const colorPopover = document.getElementById('colorPopover');
 
         window.onload = function() {
             try {
@@ -325,17 +623,29 @@
                 if (stored) {
                     savedPalettes = JSON.parse(stored);
                 }
+                const storedHashSetting = localStorage.getItem('chroma_include_hash');
+                if (storedHashSetting !== null) {
+                    includeHash = JSON.parse(storedHashSetting);
+                }
             } catch (e) {
-                console.error("Could not load saved palettes", e);
+                console.error("Could not load stored data", e);
             }
 
-            // 每次載入時隨機產生工作區預設色票 (4 個顏色)
-            currentColors = Array.from({ length: 4 }, () => getRandomHexColor());
+            document.getElementById('includeHashToggle').checked = includeHash;
 
-            // 每次載入時隨機產生快捷試色塊
+            // Check if URL contains hash palette data
+            const urlPalette = getPaletteFromURLHash();
+            if (urlPalette && urlPalette.length > 0) {
+                currentColors = urlPalette;
+            } else {
+                // Default random colors
+                currentColors = Array.from({ length: 4 }, () => getRandomHexColor());
+            }
+
+            // Generate quick swatches
             renderRandomQuickSwatches();
 
-            // 同步選擇器為第一個隨機色
+            // Sync color picker to first color
             if (currentColors.length > 0) {
                 syncColorFromPicker(currentColors[0]);
             }
@@ -343,7 +653,68 @@
             renderPalette();
             renderSavedDrawer();
             updateUIPreviews();
+
+            // Global Click listener to close popover on outside click
+            document.addEventListener('click', function(e) {
+                if (activePopoverIndex !== -1) {
+                    const isInsidePopover = colorPopover.contains(e.target);
+                    const isPaletteSegment = e.target.closest('.palette-segment-block');
+                    if (!isInsidePopover && !isPaletteSegment) {
+                        cancelPopoverCorrection();
+                    }
+                }
+            });
+
+            // Global ESC key listener
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cancelPopoverCorrection();
+                    closeSaveModal();
+                    closeRenameModal();
+                    closeExportModal();
+                    closeImageExtractModal();
+                }
+            });
         };
+
+        function getPaletteFromURLHash() {
+            try {
+                const hash = window.location.hash.replace('#', '');
+                if (hash.startsWith('colors=')) {
+                    const hexes = hash.replace('colors=', '').split('-');
+                    return hexes.map(h => '#' + h.toUpperCase()).filter(c => /^#[0-9A-Fa-f]{6}$/.test(c)).slice(0, 8);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function updateURLHash() {
+            if (currentColors.length > 0) {
+                const cleanHexes = currentColors.map(c => c.replace('#', '')).join('-');
+                history.replaceState(null, '', `#colors=${cleanHexes}`);
+            } else {
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        function sharePaletteURL() {
+            updateURLHash();
+            copyTextDirectly(window.location.href, "已複製色票分享網址！");
+        }
+
+        function toggleIncludeHash(checked) {
+            includeHash = checked;
+            try {
+                localStorage.setItem('chroma_include_hash', JSON.stringify(includeHash));
+            } catch (e) {}
+            showToast(includeHash ? "複製色碼時包含「#」" : "複製色碼時不包含「#」");
+        }
+
+        function formatColorForCopy(hex) {
+            if (!hex) return '';
+            const cleanHex = hex.replace('#', '').toUpperCase();
+            return includeHash ? `#${cleanHex}` : cleanHex;
+        }
 
         function getRandomHexColor() {
             return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase();
@@ -383,7 +754,7 @@
         }
 
         function generateRandomColor() {
-            const randomHex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase();
+            const randomHex = getRandomHexColor();
             syncColorFromPicker(randomHex);
         }
 
@@ -399,25 +770,30 @@
             currentColors.push(color.toUpperCase());
             renderPalette();
             updateUIPreviews();
-            showToast(`已新增 ${color.toUpperCase()}`);
+            updateURLHash();
+            showToast(`已新增 ${formatColorForCopy(color)}`);
         }
 
         function moveColorLeft(idx) {
             if (idx <= 0) return;
+            cancelPopoverCorrection();
             const temp = currentColors[idx];
             currentColors[idx] = currentColors[idx - 1];
             currentColors[idx - 1] = temp;
             renderPalette();
             updateUIPreviews();
+            updateURLHash();
         }
 
         function moveColorRight(idx) {
             if (idx >= currentColors.length - 1) return;
+            cancelPopoverCorrection();
             const temp = currentColors[idx];
             currentColors[idx] = currentColors[idx + 1];
             currentColors[idx + 1] = temp;
             renderPalette();
             updateUIPreviews();
+            updateURLHash();
         }
 
         function duplicateColor(idx) {
@@ -425,25 +801,31 @@
                 showToast("最多只能新增 8 個顏色！", "warning");
                 return;
             }
+            cancelPopoverCorrection();
             const colorToCopy = currentColors[idx];
             currentColors.splice(idx + 1, 0, colorToCopy);
             renderPalette();
             updateUIPreviews();
-            showToast(`已複製色塊 ${colorToCopy}`);
+            updateURLHash();
+            showToast(`已複製色塊 ${formatColorForCopy(colorToCopy)}`);
         }
 
         function removeColor(index) {
+            cancelPopoverCorrection();
             currentColors.splice(index, 1);
             renderPalette();
             updateUIPreviews();
+            updateURLHash();
             showToast("已刪除色塊");
         }
 
         function clearWorkspace() {
             if (currentColors.length === 0) return;
+            cancelPopoverCorrection();
             currentColors = [];
             renderPalette();
             updateUIPreviews();
+            updateURLHash();
             showToast("已清空工作區");
         }
 
@@ -465,25 +847,25 @@
 
             paletteContainer.className = "w-full space-y-2.5";
 
-            // 1. Seamless connected color palette bar (NO #1, #2 overlay badges)
+            // 1. Seamless connected color palette bar
             const topBar = document.createElement('div');
-            topBar.className = "w-full flex h-24 sm:h-28 rounded-xl overflow-hidden border border-cardBorder shadow-md bg-cardBg transition-all";
+            topBar.className = "w-full flex h-24 sm:h-28 rounded-xl overflow-hidden border border-cardBorder shadow-md bg-cardBg transition-all relative";
 
             // 2. Aligned bottom controls container
             const bottomControls = document.createElement('div');
             bottomControls.className = "w-full flex gap-1.5 sm:gap-2 pt-0.5";
 
             currentColors.forEach((color, idx) => {
-                // --- TOP BAR COLOR SEGMENT (Clean without text) ---
+                // --- TOP BAR COLOR SEGMENT ---
                 const segment = document.createElement('div');
-                segment.className = `flex-1 h-full relative group cursor-pointer transition-all hover:brightness-105 flex items-center justify-center select-none`;
+                segment.className = `palette-segment-block flex-1 h-full relative group cursor-pointer transition-all hover:brightness-105 flex items-center justify-center select-none`;
                 segment.style.backgroundColor = color;
-                segment.setAttribute('onclick', `copyText('${color}')`);
+                segment.setAttribute('onclick', `openColorPopover(event, ${idx})`);
 
                 segment.innerHTML = `
-                    <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-xs rounded px-2 py-0.5 text-[10px] text-white flex items-center gap-1 font-medium shadow-sm">
-                        <i class="fa-regular fa-copy text-slate-300"></i>
-                        <span>複製</span>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-xs rounded px-2 py-1 text-[10px] text-white flex items-center gap-1 font-medium shadow-sm">
+                        <i class="fa-solid fa-sliders text-slate-300"></i>
+                        <span>校正</span>
                     </div>
                 `;
                 topBar.appendChild(segment);
@@ -492,10 +874,12 @@
                 const col = document.createElement('div');
                 col.className = `flex-1 bg-cardBg border border-cardBorder rounded-xl p-1.5 sm:p-2 flex flex-col justify-between gap-1 text-center min-w-0 shadow-sm hover:border-slate-600/70 transition`;
 
+                const formattedDisplayHex = formatColorForCopy(color);
+
                 col.innerHTML = `
                     <!-- Hex Button -->
                     <button onclick="copyText('${color}')" class="font-mono font-medium text-[11px] sm:text-xs text-slate-200 hover:text-slate-400 transition truncate w-full" title="點擊複製 Hex">
-                        ${color}
+                        ${formattedDisplayHex}
                     </button>
 
                     <!-- 4 Action Buttons Row -->
@@ -528,7 +912,144 @@
             paletteContainer.appendChild(bottomControls);
         }
 
+        function openColorPopover(event, index) {
+            event.stopPropagation();
+            activePopoverIndex = index;
+            originalPopoverColor = currentColors[index];
+            currentPopoverColor = originalPopoverColor;
+
+            const popoverPicker = document.getElementById('popoverColorPicker');
+            const popoverHex = document.getElementById('popoverHexInput');
+
+            popoverPicker.value = currentPopoverColor;
+            popoverHex.value = currentPopoverColor.replace('#', '').toUpperCase();
+
+            // Sync HSL Sliders
+            const hsl = hexToHSL(currentPopoverColor);
+            document.getElementById('popoverHueSlider').value = hsl.h;
+            document.getElementById('popoverSatSlider').value = hsl.s;
+            document.getElementById('popoverLightSlider').value = hsl.l;
+
+            document.getElementById('popoverHueVal').textContent = `${hsl.h}°`;
+            document.getElementById('popoverSatVal').textContent = `${hsl.s}%`;
+            document.getElementById('popoverLightVal').textContent = `${hsl.l}%`;
+
+            updatePopoverPreviews();
+
+            // Smart positioning
+            const rect = event.currentTarget.getBoundingClientRect();
+            const popoverWidth = 256;
+            const popoverHeight = 280;
+            
+            let left = rect.left + window.scrollX + (rect.width / 2) - (popoverWidth / 2);
+            let top = rect.bottom + window.scrollY + 8;
+
+            if (rect.bottom + popoverHeight > window.innerHeight && rect.top - popoverHeight > 0) {
+                top = rect.top + window.scrollY - popoverHeight - 8;
+            }
+
+            const maxLeft = window.innerWidth - popoverWidth - 16;
+            if (left < 16) left = 16;
+            if (left > maxLeft) left = maxLeft;
+
+            colorPopover.style.left = `${left}px`;
+            colorPopover.style.top = `${top}px`;
+
+            colorPopover.classList.remove('hidden');
+        }
+
+        function syncPopoverFromHSL() {
+            const h = parseInt(document.getElementById('popoverHueSlider').value);
+            const s = parseInt(document.getElementById('popoverSatSlider').value);
+            const l = parseInt(document.getElementById('popoverLightSlider').value);
+
+            document.getElementById('popoverHueVal').textContent = `${h}°`;
+            document.getElementById('popoverSatVal').textContent = `${s}%`;
+            document.getElementById('popoverLightVal').textContent = `${l}%`;
+
+            currentPopoverColor = hslToHex(h, s, l);
+            document.getElementById('popoverColorPicker').value = currentPopoverColor;
+            document.getElementById('popoverHexInput').value = currentPopoverColor.replace('#', '');
+            updatePopoverPreviews();
+        }
+
+        function syncPopoverFromPicker(hex) {
+            currentPopoverColor = hex.toUpperCase();
+            document.getElementById('popoverHexInput').value = currentPopoverColor.replace('#', '');
+            
+            const hsl = hexToHSL(currentPopoverColor);
+            document.getElementById('popoverHueSlider').value = hsl.h;
+            document.getElementById('popoverSatSlider').value = hsl.s;
+            document.getElementById('popoverLightSlider').value = hsl.l;
+
+            document.getElementById('popoverHueVal').textContent = `${hsl.h}°`;
+            document.getElementById('popoverSatVal').textContent = `${hsl.s}%`;
+            document.getElementById('popoverLightVal').textContent = `${hsl.l}%`;
+
+            updatePopoverPreviews();
+        }
+
+        function syncPopoverFromHex(val) {
+            const cleanVal = val.replace(/[^0-9A-Fa-f]/g, '');
+            document.getElementById('popoverHexInput').value = cleanVal;
+            if (cleanVal.length === 6) {
+                currentPopoverColor = '#' + cleanVal.toUpperCase();
+                document.getElementById('popoverColorPicker').value = currentPopoverColor;
+                
+                const hsl = hexToHSL(currentPopoverColor);
+                document.getElementById('popoverHueSlider').value = hsl.h;
+                document.getElementById('popoverSatSlider').value = hsl.s;
+                document.getElementById('popoverLightSlider').value = hsl.l;
+
+                document.getElementById('popoverHueVal').textContent = `${hsl.h}°`;
+                document.getElementById('popoverSatVal').textContent = `${hsl.s}%`;
+                document.getElementById('popoverLightVal').textContent = `${hsl.l}%`;
+
+                updatePopoverPreviews();
+            }
+        }
+
+        function updatePopoverPreviews() {
+            const origPreview = document.getElementById('popoverOriginalPreview');
+            const newPreview = document.getElementById('popoverNewPreview');
+
+            origPreview.style.backgroundColor = originalPopoverColor;
+            origPreview.textContent = formatColorForCopy(originalPopoverColor);
+            origPreview.style.color = getLuminance(originalPopoverColor) > 0.55 ? '#0f172a' : '#ffffff';
+
+            newPreview.style.backgroundColor = currentPopoverColor;
+            newPreview.textContent = formatColorForCopy(currentPopoverColor);
+            newPreview.style.color = getLuminance(currentPopoverColor) > 0.55 ? '#0f172a' : '#ffffff';
+        }
+
+        function copyCurrentPopoverColor() {
+            copyText(currentPopoverColor);
+        }
+
+        function applyPopoverCorrection() {
+            if (activePopoverIndex !== -1 && /^#[0-9A-Fa-f]{6}$/.test(currentPopoverColor)) {
+                currentColors[activePopoverIndex] = currentPopoverColor;
+                renderPalette();
+                updateUIPreviews();
+                updateURLHash();
+                showToast(`已校正色彩為 ${formatColorForCopy(currentPopoverColor)}`);
+            }
+            closePopoverQuietly();
+        }
+
+        function cancelPopoverCorrection() {
+            if (activePopoverIndex !== -1) {
+                closePopoverQuietly();
+            }
+        }
+
+        function closePopoverQuietly() {
+            activePopoverIndex = -1;
+            colorPopover.classList.add('hidden');
+        }
+
         function generateHarmony(type) {
+            cancelPopoverCorrection();
             if (currentColors.length === 0) {
                 generateRandomColor();
                 addColorToPalette();
@@ -546,18 +1067,30 @@
                 newColors.push(hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l));
                 newColors.push(hslToHex((hsl.h + 180) % 360, Math.max(0, hsl.s - 20), Math.min(100, hsl.l + 15)));
                 newColors.push(hslToHex(hsl.h, Math.max(0, hsl.s - 20), Math.max(10, hsl.l - 20)));
+            } else if (type === 'split-complementary') {
+                newColors.push(hslToHex((hsl.h + 150) % 360, hsl.s, hsl.l));
+                newColors.push(hslToHex((hsl.h + 210) % 360, hsl.s, hsl.l));
             } else if (type === 'triadic') {
                 newColors.push(hslToHex((hsl.h + 120) % 360, hsl.s, hsl.l));
                 newColors.push(hslToHex((hsl.h + 240) % 360, hsl.s, hsl.l));
+            } else if (type === 'tetradic') {
+                newColors.push(hslToHex((hsl.h + 90) % 360, hsl.s, hsl.l));
+                newColors.push(hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l));
+                newColors.push(hslToHex((hsl.h + 270) % 360, hsl.s, hsl.l));
             } else if (type === 'monochromatic') {
                 newColors.push(hslToHex(hsl.h, hsl.s, Math.min(90, hsl.l + 25)));
                 newColors.push(hslToHex(hsl.h, hsl.s, Math.max(10, hsl.l - 20)));
                 newColors.push(hslToHex(hsl.h, Math.max(10, hsl.s - 30), Math.min(80, hsl.l + 10)));
+            } else if (type === 'shades') {
+                for (let l = 15; l <= 85; l += 18) {
+                    newColors.push(hslToHex(hsl.h, hsl.s, l));
+                }
             }
 
             currentColors = newColors.slice(0, 8);
             renderPalette();
             updateUIPreviews();
+            updateURLHash();
             showToast(`已生成${getHarmonyTypeName(type)}色彩`);
         }
 
@@ -565,10 +1098,58 @@
             const names = {
                 analogous: '類似色',
                 complementary: '互補色',
+                'split-complementary': '分裂互補色',
                 triadic: '三角色',
-                monochromatic: '單色系'
+                tetradic: '矩形色',
+                monochromatic: '單色系',
+                shades: '明暗階調'
             };
             return names[type] || '';
+        }
+
+        function applyColorBlindnessFilter(type) {
+            const container = document.getElementById('paletteSimulationContainer');
+            const previewArea = document.getElementById('previewGridArea');
+            const selectElement = document.getElementById('cbSimulationSelect');
+            const currentFilter = type || (selectElement ? selectElement.value : 'none');
+
+            // Reset filters on all potential targets
+            document.body.className = document.body.className.replace(/\bcb-[a-z]+\b/g, '').trim();
+            if (container) container.className = "w-full transition-all";
+            if (previewArea) previewArea.className = "grid grid-cols-1 md:grid-cols-3 gap-4 transition-all";
+
+            if (currentFilter !== 'none') {
+                if (isFullUISimulation) {
+                    // Easter egg mode: Apply color vision deficiency filter to entire page
+                    document.body.classList.add(`cb-${currentFilter}`);
+                } else {
+                    // Default mode: Apply color vision deficiency filter strictly to color palette bar
+                    if (container) container.classList.add(`cb-${currentFilter}`);
+                }
+            }
+        }
+
+        function toggleFullUISimulation() {
+            isFullUISimulation = !isFullUISimulation;
+            const label = document.getElementById('fullUILabel');
+            const btn = document.getElementById('easterEggBtn');
+            const selectElement = document.getElementById('cbSimulationSelect');
+            
+            if (label) {
+                label.textContent = isFullUISimulation ? 'ON' : 'OFF';
+                label.className = isFullUISimulation ? 'text-emerald-400 font-semibold' : 'text-slate-400 font-normal';
+            }
+            if (btn) {
+                if (isFullUISimulation) {
+                    btn.classList.add('border-emerald-500/50', 'bg-slate-800/90', 'text-slate-100');
+                } else {
+                    btn.classList.remove('border-emerald-500/50', 'bg-slate-800/90', 'text-slate-100');
+                }
+            }
+
+            // Re-apply current selected filter
+            applyColorBlindnessFilter(selectElement ? selectElement.value : 'none');
+            showToast(isFullUISimulation ? "🧪 已開啟彩蛋：全界面受視覺模擬影響" : "已切換：視覺模擬僅影響色票條");
         }
 
         function updateUIPreviews() {
@@ -642,21 +1223,233 @@
             }
         }
 
+        function openImageExtractModal() {
+            const modal = document.getElementById('imageExtractModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+        }
+
+        function closeImageExtractModal() {
+            const modal = document.getElementById('imageExtractModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('extractCanvas');
+                    const placeholder = document.getElementById('imagePlaceholderText');
+                    const ctx = canvas.getContext('2d');
+
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+
+                    // Extract dominant colors
+                    extractDominantColors(ctx, img.width, img.height);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function pickColorFromCanvas(e) {
+            const canvas = document.getElementById('extractCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            const hex = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase();
+
+            setPickerColor(hex);
+            showToast(`已選取色彩：${formatColorForCopy(hex)}`);
+        }
+
+        function extractDominantColors(ctx, width, height) {
+            const imageData = ctx.getImageData(0, 0, width, height).data;
+            const colorCounts = {};
+            const step = Math.max(1, Math.floor((width * height) / 1000));
+
+            for (let i = 0; i < imageData.length; i += 4 * step) {
+                const r = imageData[i];
+                const g = imageData[i + 1];
+                const b = imageData[i + 2];
+                const alpha = imageData[i + 3];
+
+                if (alpha < 128) continue;
+
+                const qR = Math.round(r / 32) * 32;
+                const qG = Math.round(g / 32) * 32;
+                const qB = Math.round(b / 32) * 32;
+
+                const hex = "#" + ((1 << 24) + (qR << 16) + (qG << 8) + qB).toString(16).slice(1).toUpperCase();
+                colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+            }
+
+            const sorted = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]);
+            extractedColors = sorted.slice(0, 6);
+
+            const container = document.getElementById('extractedSwatches');
+            const applyBtn = document.getElementById('applyExtractedBtn');
+
+            container.innerHTML = '';
+            extractedColors.forEach(c => {
+                const swatch = document.createElement('div');
+                swatch.className = "flex-1 h-full rounded-md cursor-pointer hover:scale-105 transition shadow-xs flex items-center justify-center font-mono text-[9px] font-semibold";
+                swatch.style.backgroundColor = c;
+                swatch.style.color = getLuminance(c) > 0.55 ? '#0f172a' : '#ffffff';
+                swatch.textContent = c;
+                swatch.onclick = () => setPickerColor(c);
+                container.appendChild(swatch);
+            });
+
+            applyBtn.disabled = false;
+        }
+
+        function applyExtractedPalette() {
+            if (extractedColors.length > 0) {
+                currentColors = [...extractedColors];
+                renderPalette();
+                updateUIPreviews();
+                updateURLHash();
+                closeImageExtractModal();
+                showToast("已帶入圖片萃取色彩至工作區！");
+            }
+        }
+
+        function openExportModal() {
+            if (currentColors.length === 0) {
+                showToast("工作區沒有顏色可供匯出！", "warning");
+                return;
+            }
+            const modal = document.getElementById('exportModal');
+            setExportTab('tailwind');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function setExportTab(tab) {
+            activeExportTab = tab;
+            const textarea = document.getElementById('exportCodeTextarea');
+            const btnText = document.querySelector('#exportActionBtn span');
+            const btnIcon = document.querySelector('#exportActionBtn i');
+
+            ['Tailwind', 'CSSVars', 'SCSS', 'JSON', 'SVG'].forEach(t => {
+                const el = document.getElementById(`tab${t}`);
+                if (el) {
+                    if (t.toLowerCase() === tab.toLowerCase()) {
+                        el.className = "py-2 px-3 border-b-2 border-slate-300 text-slate-200 shrink-0";
+                    } else {
+                        el.className = "py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-300 shrink-0";
+                    }
+                }
+            });
+
+            if (tab === 'tailwind') {
+                const obj = {};
+                currentColors.forEach((c, i) => obj[`color-${i+1}`] = formatColorForCopy(c));
+                textarea.value = `// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: ${JSON.stringify(obj, null, 8)}\n    }\n  }\n}`;
+                btnText.textContent = "複製內容";
+                btnIcon.className = "fa-regular fa-copy";
+            } else if (tab === 'cssvars') {
+                const vars = currentColors.map((c, i) => `  --color-${i + 1}: ${formatColorForCopy(c)};`).join('\n');
+                textarea.value = `:root {\n${vars}\n}`;
+                btnText.textContent = "複製內容";
+                btnIcon.className = "fa-regular fa-copy";
+            } else if (tab === 'scss') {
+                textarea.value = currentColors.map((c, i) => `$color-${i+1}: ${formatColorForCopy(c)};`).join('\n');
+                btnText.textContent = "複製內容";
+                btnIcon.className = "fa-regular fa-copy";
+            } else if (tab === 'json') {
+                textarea.value = JSON.stringify(currentColors.map(c => formatColorForCopy(c)), null, 2);
+                btnText.textContent = "複製內容";
+                btnIcon.className = "fa-regular fa-copy";
+            } else if (tab === 'svg') {
+                const rects = currentColors.map((c, i) => `<rect x="${i * 100}" y="0" width="100" height="150" fill="${c}" />`).join('\n  ');
+                textarea.value = `<svg xmlns="http://www.w3.org/2000/svg" width="${currentColors.length * 100}" height="150">\n  ${rects}\n</svg>`;
+                btnText.textContent = "下載 SVG 檔";
+                btnIcon.className = "fa-solid fa-download";
+            }
+        }
+
+        function downloadOrCopyExport() {
+            const textarea = document.getElementById('exportCodeTextarea');
+            if (activeExportTab === 'svg') {
+                const blob = new Blob([textarea.value], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `palette_${Date.now()}.svg`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast("已下載 SVG 色票檔案！");
+            } else {
+                copyTextDirectly(textarea.value, "已複製代碼至剪貼簿！");
+            }
+        }
+
         function openSaveModal() {
             if (currentColors.length === 0) {
                 showToast("工作區沒有顏色可供儲存！", "warning");
                 return;
             }
+            cancelPopoverCorrection();
             const modal = document.getElementById('saveModal');
             const input = document.getElementById('paletteNameInput');
             const modalPreview = document.getElementById('modalColorPreview');
+            const targetSelect = document.getElementById('saveTargetSelect');
 
+            targetSelect.innerHTML = `<option value="NEW">+ 另存為新色票組合</option>`;
+            savedPalettes.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `覆蓋：${p.title} (${p.colors.length}色)`;
+                targetSelect.appendChild(opt);
+            });
+
+            targetSelect.value = "NEW";
             input.value = `色票組合 #${savedPalettes.length + 1}`;
             modalPreview.innerHTML = currentColors.map(c => `<div class="flex-1 h-full" style="background-color: ${c}"></div>`).join('');
 
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
             setTimeout(() => input.select(), 100);
+        }
+
+        function handleSaveTargetChange(val) {
+            const input = document.getElementById('paletteNameInput');
+            const confirmBtn = document.getElementById('confirmSaveBtn');
+            if (val === "NEW") {
+                input.value = `色票組合 #${savedPalettes.length + 1}`;
+                confirmBtn.textContent = "確認儲存";
+            } else {
+                const target = savedPalettes.find(p => p.id == val);
+                if (target) {
+                    input.value = target.title;
+                    confirmBtn.textContent = "覆蓋舊色票";
+                }
+            }
         }
 
         function closeSaveModal() {
@@ -667,23 +1460,75 @@
 
         function confirmSavePalette() {
             const input = document.getElementById('paletteNameInput');
+            const targetSelect = document.getElementById('saveTargetSelect');
+            const targetVal = targetSelect.value;
             const title = input.value.trim() || `色票組合 #${savedPalettes.length + 1}`;
 
-            const newPalette = {
-                id: Date.now(),
-                title: title,
-                colors: [...currentColors],
-                date: new Date().toLocaleDateString('zh-TW')
-            };
+            if (targetVal === "NEW") {
+                const newPalette = {
+                    id: Date.now(),
+                    title: title,
+                    colors: [...currentColors],
+                    date: new Date().toLocaleDateString('zh-TW')
+                };
+                savedPalettes.unshift(newPalette);
+                showToast(`已儲存新色票「${title}」`);
+            } else {
+                const idx = savedPalettes.findIndex(p => p.id == targetVal);
+                if (idx !== -1) {
+                    savedPalettes[idx].title = title;
+                    savedPalettes[idx].colors = [...currentColors];
+                    savedPalettes[idx].date = new Date().toLocaleDateString('zh-TW');
+                    showToast(`已覆蓋更新色票「${title}」`);
+                }
+            }
 
-            savedPalettes.unshift(newPalette);
             try {
                 localStorage.setItem('chroma_saved_palettes', JSON.stringify(savedPalettes));
             } catch (e) {}
 
             closeSaveModal();
             renderSavedDrawer();
-            showToast(`已儲存「${title}」`);
+        }
+
+        function openRenameModal(id, currentTitle) {
+            activeRenameId = id;
+            const modal = document.getElementById('renameModal');
+            const input = document.getElementById('renameInput');
+            input.value = currentTitle;
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+            setTimeout(() => input.select(), 100);
+        }
+
+        function closeRenameModal() {
+            const modal = document.getElementById('renameModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            activeRenameId = null;
+        }
+
+        function confirmRenamePalette() {
+            if (!activeRenameId) return;
+            const input = document.getElementById('renameInput');
+            const newTitle = input.value.trim();
+
+            if (!newTitle) {
+                showToast("名稱不能為空！", "warning");
+                return;
+            }
+
+            const item = savedPalettes.find(p => p.id === activeRenameId);
+            if (item) {
+                item.title = newTitle;
+                try {
+                    localStorage.setItem('chroma_saved_palettes', JSON.stringify(savedPalettes));
+                } catch (e) {}
+                renderSavedDrawer();
+                showToast(`已改名為「${newTitle}」`);
+            }
+            closeRenameModal();
         }
 
         function setSavedViewMode(mode) {
@@ -702,11 +1547,9 @@
 
         function renderSavedDrawer() {
             const container = document.getElementById('savedPalettesList');
-            const savedCountBadge = document.getElementById('savedCountBadge');
             const floatingSavedBadge = document.getElementById('floatingSavedBadge');
             const searchVal = (document.getElementById('savedSearchInput')?.value || '').trim().toLowerCase();
 
-            savedCountBadge.textContent = savedPalettes.length;
             floatingSavedBadge.textContent = savedPalettes.length;
 
             if (savedPalettes.length === 0) {
@@ -743,16 +1586,19 @@
                     const card = document.createElement('div');
                     card.className = 'bg-darkBg/90 border border-cardBorder rounded-xl p-3 space-y-2.5 hover:border-slate-700 transition shadow-xs';
 
-                    const colorBars = item.colors.map(c => `<div class="flex-1 h-7 first:rounded-l-md last:rounded-r-md group relative cursor-pointer" style="background-color: ${c}" onclick="copyText('${c}')" title="點擊複製 ${c}"></div>`).join('');
-                    const hexBadges = item.colors.map(c => `<span class="text-[10px] font-mono text-slate-400 hover:text-slate-200 cursor-pointer" onclick="copyText('${c}')">${c}</span>`).join(' ');
+                    const colorBars = item.colors.map(c => `<div class="flex-1 h-7 first:rounded-l-md last:rounded-r-md group relative cursor-pointer" style="background-color: ${c}" onclick="copyText('${c}')" title="點擊複製 ${formatColorForCopy(c)}"></div>`).join('');
+                    const hexBadges = item.colors.map(c => `<span class="text-[10px] font-mono text-slate-400 hover:text-slate-200 cursor-pointer" onclick="copyText('${c}')">${formatColorForCopy(c)}</span>`).join(' ');
 
                     card.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xs font-medium text-slate-200">${item.title}</h4>
-                                <span class="text-[9px] text-slate-500">${item.date}</span>
+                            <div class="flex items-center gap-1.5 min-w-0 flex-1 mr-2">
+                                <h4 class="text-xs font-medium text-slate-200 truncate" title="${item.title}">${item.title}</h4>
+                                <button onclick="openRenameModal(${item.id}, '${item.title.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-slate-300 p-0.5 text-[10px]" title="修改名稱">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
                             </div>
-                            <div class="flex items-center space-x-1">
+                            <div class="flex items-center space-x-1 shrink-0">
+                                <span class="text-[9px] text-slate-500 mr-1">${item.date}</span>
                                 <button onclick="loadSavedPalette(${item.id})" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" title="載入至工作區">
                                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                                 </button>
@@ -771,7 +1617,6 @@
                     container.appendChild(card);
                 });
             } else {
-                // Compact View
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-2 gap-2';
 
@@ -785,6 +1630,9 @@
                         <div>
                             <div class="flex items-center justify-between gap-1 mb-1.5">
                                 <h4 class="text-[11px] font-medium text-slate-200 truncate flex-1" title="${item.title}">${item.title}</h4>
+                                <button onclick="openRenameModal(${item.id}, '${item.title.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-slate-300 p-0.5 text-[10px]" title="修改名稱">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
                             </div>
                             <div class="flex rounded-sm overflow-hidden border border-slate-800">
                                 ${colorBars}
@@ -811,9 +1659,11 @@
         function loadSavedPalette(id) {
             const item = savedPalettes.find(p => p.id === id);
             if (item) {
+                cancelPopoverCorrection();
                 currentColors = [...item.colors];
                 renderPalette();
                 updateUIPreviews();
+                updateURLHash();
                 showToast(`已載入「${item.title}」`);
                 toggleSavedDrawer();
             }
@@ -833,17 +1683,6 @@
             drawer.classList.toggle('translate-x-full');
         }
 
-        function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentColors, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `palettechips_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast("已成功匯出 JSON 檔案");
-        }
-
         function importJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -853,9 +1692,11 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
+                        cancelPopoverCorrection();
                         currentColors = imported.filter(c => /^#[0-9A-Fa-f]{6}$/.test(c)).slice(0, 8);
                         renderPalette();
                         updateUIPreviews();
+                        updateURLHash();
                         showToast("JSON 色票成功匯入！");
                     } else {
                         showToast("匯入格式不正確！", "warning");
@@ -867,14 +1708,24 @@
             reader.readAsText(file);
         }
 
-        function copyCSSVariables() {
-            if (currentColors.length === 0) return;
-            const cssText = currentColors.map((c, i) => `  --color-${i + 1}: ${c};`).join('\n');
-            copyText(`:root {\n${cssText}\n}`);
-            showToast("已複製 CSS 變數");
+        function copyText(hex) {
+            const textToCopy = formatColorForCopy(hex);
+            copyTextDirectly(textToCopy, `${textToCopy} 已複製`);
         }
 
-        function copyText(text) {
+        function copyTextDirectly(text, toastMsg) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(toastMsg);
+                }).catch(() => {
+                    fallbackCopyText(text, toastMsg);
+                });
+            } else {
+                fallbackCopyText(text, toastMsg);
+            }
+        }
+
+        function fallbackCopyText(text, toastMsg) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
             textarea.style.position = 'fixed';
@@ -883,7 +1734,7 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                showToast(`${text} 已複製到剪貼簿`);
+                showToast(toastMsg);
             } catch (err) {
                 console.error("複製失敗", err);
             }
